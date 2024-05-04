@@ -28,6 +28,31 @@
   color: #61dafb;
 }
 
+.h1 {
+  background: #6666;
+  float: left;
+  border: 1px solid #999;
+  margin-top: 20px;
+  margin-left: 20px;
+  font-size: 22px;
+  display: flex;
+}
+.h2 {
+  float: left;
+  margin-top: 20px;
+  margin-left: 20px;
+  font-size: 16px;
+}
+.h3 {
+  margin-top: 10px;
+  float: left;
+}
+.h4 {
+  margin-top: 20px;
+  margin-left: 20px;
+  float: left;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

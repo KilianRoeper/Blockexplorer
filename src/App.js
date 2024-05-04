@@ -25,7 +25,7 @@ function App() {
     block: null,
     transaction: null,
     //transaction_receipt: null
-    BlockWithTransactions: null
+    BlockWithTransactions: null,
   });
 
 
@@ -33,18 +33,16 @@ function App() {
     async function fetchData(){
 
       let blockTagOrHash = "latest";
-      let blocks = [];
 
       const blocknumber = await alchemy.core.getBlockNumber();
       let block = await alchemy.core.getBlock(blockTagOrHash);
-      blocks.push(block);
       const transaction = await alchemy.core.getTransactionCount("vitalik.eth");
       //const transaction_receipt = await alchemy.core.getTransactionReceipt(0xc105432b3301b56156233518656ab9aa334021e893fe5507a151c17877342b10);
       const BWT = await alchemy.core.getBlockWithTransactions(blockTagOrHash);
 
-      setBlockData({
+        setBlockData({
         blockNumber: blocknumber,
-        block: blocks,
+        block: block,
         transaction: transaction,
         //transaction_receipt: transaction_receipt
         BlockWithTransactions: BWT,
@@ -53,24 +51,66 @@ function App() {
     fetchData();
   });
 
+  const [Balance, setBalance] = useState(null);
+
+  const [address, setAddress] = useState('');
+
+  const isValidAddress = (address) => {
+    return /^(0x)?[0-9a-fA-F]{40}$/.test(address);
+  };
+
+  const getBalance = async () => {
+    if (isValidAddress(address)) {
+      let balance = await alchemy.core.getBalance(address, "latest");
+      setBalance(balance);
+      console.log(balance);
+      //console.log(Balance);
+    } else {
+      alert('Ungültige Ethereum-Adresse!');
+    }
+  };
+
+ /* useEffect(() => {
+    console.log(Balance);
+  }, [Balance]); 
+*/
+
   return (
     <div className="App">
-      <div>Block Number: {blockData.blockNumber}</div>
-        <div>Block: {blockData.block && blockData.block.length > 0 && (
-          <div>
-            <div>Block Hash: {blockData.block[0].hash}</div>
-            <div>Timestamp: {blockData.block[0].timestamp}</div>
-            <div>number Transactions: {blockData.block[0].transactions.length}</div>
-            {/* Weitere Felder des Blocks hier einfügen */}
-          </div>
-        )}</div>
-        <div>{blockData.BlockWithTransactions && (
-          <div>
-            <div>Block Transactions: {blockData.BlockWithTransactions}</div>
-            <div>jizz</div>
-          </div>
-        )}</div>
-      <div>Transaction Count: {blockData.transaction}</div>
+      <div className='h1' >Block Number: {blockData.blockNumber}</div>
+      <div className='h4'>      
+        <input
+        type="text"
+        value={address}
+        onChange={(e) => setAddress(e.target.value)}
+        placeholder="Address to get Balance!"
+      />
+        <button onClick={getBalance}>Submit</button>
+        <div>Balance of Address {address}: {Balance ? Balance._hex : null}</div>
+      </div>
+      <div>Block: {blockData.block && (
+        <div>
+          <div>latest Block transaction number: {blockData.block.transactions.length}</div>
+          <div>Block Hash: {blockData.block.hash}</div>
+          <div>Timestamp: {blockData.block.timestamp}</div>
+          <ul className='h2'>
+            Transactions: {blockData.block.transactions.map((transaction, index) => (
+              <li key={index}>
+                <div className='h3'>Transaction {index + 1}</div>
+                <div className='h3'>Transaction Hash: {transaction}</div>
+              </li>
+            ))}
+            </ul>
+          {/* Weitere Felder des Blocks hier einfügen */}
+        </div>
+      )}</div>
+      <div className='h4'> Transaction Receipt: {blockData.BlockWithTransactions && (
+        <div>
+          <div className='h4'>Block transaction data of first included transaction: {blockData.BlockWithTransactions.transactions[0].data}</div>
+        </div>
+      )}
+      </div>
+      <div className='h4'>Vitaliks Transaction Count: {blockData.transaction}</div>
       {/* Weitere Daten hier einfügen */}
     </div>
   );
